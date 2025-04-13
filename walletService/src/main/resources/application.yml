@@ -1,5 +1,6 @@
+
 server:
-  port: 8081
+  port: 8082
 
 spring:
   datasource:
@@ -22,8 +23,11 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: test-group
+      group-id: wallet-group
       auto-offset-reset: earliest
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "com.wallet.walletservice.dto"
 
-jwt:
-  secret: Z8tB93WnY6dQ2cXLm4gH7kTpJvEzUaFbY6dQ2cXLm4gH7kTY6dQ2cXLm4gH7kT

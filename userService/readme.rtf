@@ -1,8 +1,11 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2761
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\froman\fcharset0 Times-Bold;\f2\froman\fcharset0 Times-Roman;
-\f3\fmodern\fcharset0 Courier;}
-{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
-{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleColorEmoji;\f2\froman\fcharset0 Times-Bold;
+\f3\froman\fcharset0 Times-Roman;\f4\fmodern\fcharset0 Courier;\f5\fnil\fcharset0 Monaco;
+\f6\fnil\fcharset0 Menlo-Bold;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red38\green38\blue38;
+\red149\green255\blue145;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;\cssrgb\c20000\c20000\c20000;
+\cssrgb\c63529\c98824\c63529;}
 \paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
@@ -15,20 +18,21 @@ Swagger url:   http://localhost:8081/swagger-ui/index.html\
 \
 \pard\pardeftab720\sa280\partightenfactor0
 
-\f1\b\fs28 \cf0 \expnd0\expndtw0\kerning0
-\outl0\strokewidth0 \strokec2 \uc0\u55357 \u56592  1. User Registration\
+\f1\fs28 \cf0 \expnd0\expndtw0\kerning0
+\uc0\u55357 \u56592 
+\f2\b  1. User Registration\
 \pard\pardeftab720\sa240\partightenfactor0
 
 \fs24 \cf0 Endpoint:
-\f2\b0 \uc0\u8232 
-\f3\fs26 POST /users/register
-\f2\fs24 \
+\f3\b0 \uc0\u8232 
+\f4\fs26 POST /users/register
+\f3\fs24 \
 
-\f1\b Request Body:
-\f2\b0 \
+\f2\b Request Body:
+\f3\b0 \
 \pard\pardeftab720\partightenfactor0
 
-\f3\fs26 \cf0 json\
+\f4\fs26 \cf0 json\
 \
 \{\
   "name": "Alice",\
@@ -38,66 +42,80 @@ Swagger url:   http://localhost:8081/swagger-ui/index.html\
 \
 \pard\pardeftab720\sa280\partightenfactor0
 
-\f1\b\fs28 \cf0 \uc0\u55357 \u56593  2. User Login\
+\f1\fs28 \cf0 \uc0\u55357 \u56593 
+\f2\b  2. User Login\
 \pard\pardeftab720\sa240\partightenfactor0
 
 \fs24 \cf0 Endpoint:
-\f2\b0 \uc0\u8232 
-\f3\fs26 POST /users/login
-\f2\fs24 \
+\f3\b0 \uc0\u8232 
+\f4\fs26 POST /users/login
+\f3\fs24 \
 
-\f1\b Request Body:
-\f2\b0 \
+\f2\b Request Body:
+\f3\b0 \
 \pard\pardeftab720\partightenfactor0
 
-\f3\fs26 \cf0 json\
+\f4\fs26 \cf0 json\
 \
 \{\
   "email": "alice@example.com",\
   "password": "secret123"\
 \}\
+\
+\
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalt \clshdrawnil \clwWidth25880\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt200 \clpadl0 \clpadr0 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\parhyphenfactor20\partightenfactor0
+
+\f5\fs24 \cf3 \cb4 \{\
+  "name": \cf5 "Donald"\cf3 ,\
+  "email": \cf5 "donald@example.co"\cf3 \
+\}
+\f6\b \cell \lastrow\row
 \pard\pardeftab720\partightenfactor0
-\cf0 \
+
+\f4\b0\fs26 \cf0 \cb1 \
 \pard\pardeftab720\sa280\partightenfactor0
 
-\f1\b\fs28 \cf0 \uc0\u55357 \u57057 \u65039  3. Calling Secured APIs\
+\f1\fs28 \cf0 \uc0\u55357 \u57057 \u65039 
+\f2\b  3. Calling Secured APIs\
 \pard\pardeftab720\sa240\partightenfactor0
 
-\f2\b0\fs24 \cf0 All other endpoints (like 
-\f3\fs26 /users/me
-\f2\fs24 ) are 
-\f1\b JWT protected
-\f2\b0 .\
+\f3\b0\fs24 \cf0 All other endpoints (like 
+\f4\fs26 /users/me
+\f3\fs24 ) are 
+\f2\b JWT protected
+\f3\b0 .\
 
-\f1\b How to use the token:
-\f2\b0 \
+\f2\b How to use the token:
+\f3\b0 \
 Add this HTTP header to every secured API call:\
 \pard\pardeftab720\partightenfactor0
 
-\f3\fs26 \cf0 makefile\
+\f4\fs26 \cf0 makefile\
 \
 Authorization: Bearer <paste_token_here>\
-\pard\pardeftab720\partightenfactor0
-\cf0 \
+\
 \
 \
 \pard\pardeftab720\sa280\partightenfactor0
 
-\f1\b\fs28 \cf0 \uc0\u55357 \u56420  4. Get Current User Info\
+\f1\fs28 \cf0 \uc0\u55357 \u56420 
+\f2\b  4. Get Current User Info\
 \pard\pardeftab720\sa240\partightenfactor0
 
 \fs24 \cf0 Endpoint:
-\f2\b0 \uc0\u8232 
-\f3\fs26 GET /users/me
-\f2\fs24 \
+\f3\b0 \uc0\u8232 
+\f4\fs26 GET /users/me
+\f3\fs24 \
 
-\f1\b Headers:
-\f2\b0 \
+\f2\b Headers:
+\f3\b0 \
 \pard\pardeftab720\partightenfactor0
 
-\f3\fs26 \cf0 makefile\
+\f4\fs26 \cf0 makefile\
 \
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\
-\pard\pardeftab720\partightenfactor0
-\cf0 \
+\
 }
