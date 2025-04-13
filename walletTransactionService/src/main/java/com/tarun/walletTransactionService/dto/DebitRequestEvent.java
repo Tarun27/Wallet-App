@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransferDebitedEvent {
+public class DebitRequestEvent {
     private Long transactionId;
     private Long toUserId;
-    private Long amount;
+    private BigDecimal amount;
+
 }

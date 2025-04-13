@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,7 +21,9 @@ public class WalletTransferTransaction {
 
     private Long fromUserId;
     private Long toUserId;
-    private Long amount; // in paise
+
+    @Column(nullable = false)
+    private BigDecimal amount;
 
     private String status; // PENDING, SUCCESS, FAILED
 

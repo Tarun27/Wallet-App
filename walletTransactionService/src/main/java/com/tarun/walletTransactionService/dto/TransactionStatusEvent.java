@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransferCompletedEvent {
+public class TransactionStatusEvent {
     private Long transactionId;
-    private String finalStatus; // SUCCESS or FAILED
+    private String status; // SUCCESS or FAILED
+    private String stage;  // DEBIT or CREDIT
 }

@@ -1,4 +1,4 @@
-package com.tarun.walletTransactionService.dto;
+package com.tarun.walletService.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +9,8 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransferInitiatedEvent {
+public class CreditRequestEvent {
     private Long transactionId;
-    private Long fromUserId;
-    private Long toUserId;
+    private Long userId;
     private BigDecimal amount;
 }

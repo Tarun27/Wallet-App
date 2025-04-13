@@ -9,9 +9,8 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransferInitiatedEvent {
+public class CreditRequestEvent {
     private Long transactionId;
-    private Long fromUserId;
-    private Long toUserId;
+    private Long userId;
     private BigDecimal amount;
 }
