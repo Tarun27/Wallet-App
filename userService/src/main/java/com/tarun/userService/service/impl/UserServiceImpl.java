@@ -1,16 +1,16 @@
 package com.tarun.userService.service.impl;
 
-import com.tarun.userService.dto.LoginRequest;
-import com.tarun.userService.dto.LoginResponse;
-import com.tarun.userService.dto.RegisterRequest;
-import com.tarun.userService.dto.RegisterResponse;
+import com.tarun.userService.dto.*;
 import com.tarun.userService.entity.User;
 import com.tarun.userService.repository.UserRepository;
 import com.tarun.userService.security.JwtUtil;
 import com.tarun.userService.service.interfaces.UserService;
 import com.tarun.userService.util.PasswordEncoderUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +18,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
 
     @Override
@@ -32,6 +33,16 @@ public class UserServiceImpl implements UserService {
         user.setPassword(PasswordEncoderUtil.encode(request.getPassword()));
 
         user = userRepository.save(user);
+
+        UserCreatedEvent event = new UserCreatedEvent(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                LocalDateTime.now()
+        );
+
+        kafkaTemplate.send("user.created", event);
+
 
         return new RegisterResponse(user.getId(), user.getEmail(), "User registered successfully");
     }
@@ -50,5 +61,20 @@ public class UserServiceImpl implements UserService {
         String token = jwtUtil.generateToken(user.getEmail());
         return new LoginResponse(token, "Login successful");
     }
+
+    @Override
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+    }
+
+    @Override
+    public UserResponse getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+    }
+
 
 }

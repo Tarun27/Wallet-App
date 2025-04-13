@@ -1,9 +1,6 @@
 package com.tarun.userService.controller;
 
-import com.tarun.userService.dto.LoginRequest;
-import com.tarun.userService.dto.LoginResponse;
-import com.tarun.userService.dto.RegisterRequest;
-import com.tarun.userService.dto.RegisterResponse;
+import com.tarun.userService.dto.*;
 import com.tarun.userService.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +28,22 @@ public class UserController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    
+
     @GetMapping("/users/me")
     public ResponseEntity<String> getCurrentUser(Authentication auth) {
         return ResponseEntity.ok("Logged in as: " + auth.getName());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
+
 
 
 }
