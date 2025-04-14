@@ -34,7 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
                     txn.getId(), fromUserId, toUserId, amount
             );
 
-            kafkaTemplate.send("wallet.transaction.created", event);
+            kafkaTemplate.send("wallet.transaction.debit.request", event);
         }
 
 

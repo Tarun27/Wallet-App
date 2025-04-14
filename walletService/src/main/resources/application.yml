@@ -22,12 +22,4 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: wallet-group
-      auto-offset-reset: earliest
-      properties:
-        spring:
-          json:
-            trusted:
-              packages: "com.wallet.walletservice.dto"
 

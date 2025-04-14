@@ -47,5 +47,11 @@ public class WalletServiceImpl implements WalletService {
 
         return walletRepository.save(wallet);
     }
+    public void refundToUser(Long userId, BigDecimal amount) {
+        Wallet wallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
+        wallet.setBalance(wallet.getBalance().add(amount));
+        walletRepository.save(wallet);
+    }
 }
