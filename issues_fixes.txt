@@ -1,0 +1,79 @@
+Summary of Issues & Fixes
+
+1. Kafka CLI Tool & Topic Verification
+
+Issue:
+Initially, commands like kafka-console-consumer.sh weren’t running because of incorrect paths or Docker container settings.
+
+Fix:
+Executed Kafka commands within the Docker container or used full paths to Kafka's bin directory.
+
+2. Topic Mismatch Between Services
+
+Issue:
+The Transaction Service was sending messages to one topic (e.g., "wallet.transaction.created") while the Wallet Service was listening on other topics (like "wallet.transaction.debit.request").
+
+Fix:
+Aligned topic names so that messages flow correctly from Transaction Service to Wallet Service.
+
+3. Kafka Transfer Flow (Debit/Credit/Rollback)
+
+Issue:
+Implementing a two-step transfer flow required careful orchestration: debit first, then credit. Rollback was needed if credit failed.
+
+Fix:
+Separated topics and listeners for debit success, debit failure, credit requests, and rollback events.
+Implemented compensating actions (a rollback event) when crediting could not be performed.
+
+4. JSON Deserialization & Type Matching Issues
+
+Issue:
+Configuration Conflicts:
+
+Errors like “JsonDeserializer must be configured with property setters, or via configuration properties; not both” occurred because we tried mixing constructor‑based type setting with property‑based configuration.
+Incorrect Default Type:
+A ClassNotFoundException occurred because the default type was set to the wrong fully qualified class name (e.g., using com.tarun.walletService.dto.TransactionStatusEvent instead of the correct com.tarun.walletTransactionService.dto.TransactionStatusEvent).
+Exact Object Matching:
+The deserializer was using type headers (like __TypeId__) to determine which Java class to instantiate. This meant that if the Kafka producer attached a type header with an exact class name that did not match the one in the consumer’s classpath (or if type headers were present when the consumer wasn’t expecting them), deserialization would fail.
+What Was Tried:
+We tried both constructor-based and property-based configuration for the JsonDeserializer.
+Ultimately, we disabled type headers by setting JsonSerializer.ADD_TYPE_INFO_HEADERS on the producer side and JsonDeserializer.USE_TYPE_INFO_HEADERS to false on the consumer side so that the consumer would not rely on type headers for matching the class name.
+We ensured that the default type was set via configuration (JsonDeserializer.VALUE_DEFAULT_TYPE) to force the deserializer to always create the expected target object.
+
+Fix:
+Property-Based Configuration Only:
+We settled on using property‑only configuration for the JsonDeserializer by not passing the target type in the constructor and instead setting it via the consumer configuration.
+Disabling Type Headers:
+On the producer side, we disabled type headers (ADD_TYPE_INFO_HEADERS=false).
+On the consumer side, we set USE_TYPE_INFO_HEADERS=false so the consumer ignores any headers that might specify an incompatible exact class name.
+Correct Default Type:
+We updated the default type property to use the correct package and class name of our DTOs.
+
+Overall Lesson:
+Listeners in Spring Kafka can be very strict about matching the exact object class name during deserialization. If the message contains a type header that doesn’t exactly match the consumer’s expected class (or if no matching default type is provided), deserialization will fail. By disabling type header usage and setting the correct default type purely via configuration properties, we ensure that messages are always deserialized to the correct type.
+
+
+5. Consumer & Listener Configuration
+
+Issue:
+
+Consumers for events like TransactionStatusEvent were receiving messages as LinkedHashMap instead of the typed object, because the container factory wasn’t set up to enforce the correct deserialization type.
+
+Fix:
+Created dedicated consumer factories and listener container factories for each event type (such as TransactionStatusEvent) and updated the @KafkaListener annotations to reference the appropriate container factory.
+This ensured that messages from topics like "wallet.transaction.debit.success" were properly deserialized into TransactionStatusEvent objects.
+
+6. Project Structure & Dependency Alignment
+
+Issue:
+Some errors were also due to package mismatches (using DTO classes from the wrong package) and missing dependencies (e.g., unresolved ConsumerFactory).
+
+Fix:
+Updated imports and Maven/Gradle dependencies to ensure that each microservice used the proper version of Spring Kafka, and that the correct fully qualified class names were being referenced.
+
+
+
+
+
+
+
