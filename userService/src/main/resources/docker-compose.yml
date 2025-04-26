@@ -29,5 +29,12 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  # ── new: plain JDK 17 container ─────────────────────────────
+  jdk17:
+    image: eclipse-temurin:17-jdk    # OpenJDK 17 from Eclipse Temurin
+    container_name: jdk17
+    tty: true                        # lets you docker exec / run bash
+    # no ports, env-vars, or volumes unless you need them
+
 volumes:
   pgdata:

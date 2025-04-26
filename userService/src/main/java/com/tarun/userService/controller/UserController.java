@@ -28,7 +28,6 @@ public class UserController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-
     @GetMapping("/users/me")
     public ResponseEntity<String> getCurrentUser(Authentication auth) {
         return ResponseEntity.ok("Logged in as: " + auth.getName());

@@ -1,0 +1,8 @@
+spring:
+  config:
+    activate:
+      on-profile: dev     # ← tells Spring this file is used only when profile = dev
+
+logging:
+  level:
+    com.tarun.userService.logging: DEBUG   # enable DEBUG only for your interceptor
