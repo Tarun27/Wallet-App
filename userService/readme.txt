@@ -1,4 +1,4 @@
-
+to run dev profile:  ./gradlew bootRun --args='--spring.profiles.active=dev'
 
 
 Swagger url:   http://localhost:8081/swagger-ui/index.html
