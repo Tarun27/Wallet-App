@@ -13,6 +13,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     networks:
       - wallet-net
@@ -44,4 +45,5 @@ services:
 
 networks:
   wallet-net:
-    external: true
+    name: wallet-net
+    driver: bridge

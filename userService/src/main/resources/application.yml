@@ -30,5 +30,23 @@ spring:
       group-id: test-group
       auto-offset-reset: earliest
 
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health, info, prometheus
+
+    metrics:
+      tags:
+        application: user-service
+
+    otlp:
+      tracing:
+        endpoint: http://tempo:4318
+        protocol: http/protobuf
+
+logging:
+      file:
+        name: /var/log/user-service/user.log
 jwt:
   secret: Z8tB93WnY6dQ2cXLm4gH7kTpJvEzUaFbY6dQ2cXLm4gH7kTY6dQ2cXLm4gH7kT
