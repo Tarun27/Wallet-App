@@ -1,3 +1,6 @@
+
+to build and run: docker compose up --build
+
 to run dev profile:  ./gradlew bootRun --args='--spring.profiles.active=dev'
 
 
