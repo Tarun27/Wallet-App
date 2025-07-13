@@ -73,6 +73,46 @@ wallet-app/
 | Preview build  | `npm run preview` |
 | Lint           | `npm run lint`    |
 
+
+🏠 Main Pages
+
+/login - Login Page
+Accepts email & password.
+Stores JWT token on successful login.
+
+/home - Home Page
+Dashboard page with balance/cards (mock data).
+Navigation bar with Profile & Logout options.
+
+/profile - Profile Page
+Fetches user details from /users/me using the stored JWT token.
+Displays user information with an Edit button.
+On clicking Edit, fields become editable; user can update details and password.
+Saves changes via PUT /users/profile API.
+
+🔗 Backend API Endpoints Used
+
+POST /users/login
+→ Authenticates user and returns { token, message }.
+GET /users/me
+→ Returns current user’s profile.
+PUT /users/profile
+→ Updates user’s profile details.
+
+
+⚙️ Configuration
+
+The backend API base URL is set in src/lib/api.js.
+Make sure CORS is enabled on your backend for http://localhost:5173.
+
+📝 Notes
+
+All tokens are stored in localStorage and checked for expiry on each protected page.
+Profile updates:
+If password field is blank, the password remains unchanged.
+All other fields update as entered.
+
+
 🧪 Next Steps
 
 [ ] Add React-Router (/login, /dashboard)
