@@ -47,8 +47,8 @@ export default function Landing() {
       {/* === Hero === */}
       <main className="mx-auto max-w-7xl px-6 py-28 text-center">
         <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-          Build and manage assets on a <br />
-          <span className="text-sky-600">single, collaborative platform</span>
+         Manage, track and grow your assets <br />
+          <span className="text-sky-600"> all in one place.</span>
         </h1>
         <p className="mt-6 max-w-2xl mx-auto text-lg text-slate-600">
           Join the world’s most widely adopted, AI-powered wallet platform.

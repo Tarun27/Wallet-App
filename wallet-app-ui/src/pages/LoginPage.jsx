@@ -8,15 +8,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const login = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+    setMessage('');
     try {
       const { data } = await API.post('/users/login', { email, password });
       localStorage.setItem('wallet-token', data.token);
       localStorage.setItem('wallet-exp', Date.now() + 3600000);
+      if (data.message) setMessage(data.message);
       navigate('/home', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -31,6 +35,9 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-6 text-center">Sign In</h1>
         {error && (
           <div className="mb-4 text-sm text-center text-red-600">{error}</div>
+        )}
+        {message && (
+          <div className="mb-4 text-sm text-center text-green-600">{message}</div>
         )}
         <form onSubmit={login} className="space-y-4">
           <input
