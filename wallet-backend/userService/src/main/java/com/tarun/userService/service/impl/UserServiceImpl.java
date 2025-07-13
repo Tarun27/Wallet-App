@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(req.getEmail());
 
         if (req.getPassword() != null && !req.getPassword().isBlank()) {
-            user.setPassword(req.getPassword()); // encode!
+            user.setPassword(PasswordEncoderUtil.encode(req.getPassword())); // encode!
         }
 
         userRepository.save(user);
