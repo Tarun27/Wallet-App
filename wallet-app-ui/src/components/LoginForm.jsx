@@ -1,21 +1,23 @@
-import React, { useState } from "react";
+// src/components/LoginForm.jsx
+import React, { useState } from 'react';
+import API from '../lib/api';
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPwd, setShowPwd] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [email,    setEmail]    = useState('');
+  const [password, setPassword] = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
     try {
-      await fakeLogin(email, password);
-      alert("Login successful!");
+      const { data } = await API.post('/users/login', { email, password });
+      // store JWT or redirect
+      alert('Login success! Token: ' + data.token);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -24,7 +26,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-900/40 border border-red-700 text-red-300 text-sm p-3 rounded-md">
+        <div className="bg-red-100 text-red-700 text-sm p-3 rounded-md">
           {error}
         </div>
       )}
@@ -35,12 +37,11 @@ export default function LoginForm() {
         </label>
         <input
           id="email"
-          name="email"
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="input-brand"
+          className="w-full rounded-md border border-slate-300 px-4 py-2.5 focus:border-sky-500 focus:outline-none"
           placeholder="you@example.com"
         />
       </div>
@@ -49,51 +50,24 @@ export default function LoginForm() {
         <label htmlFor="password" className="block text-sm font-medium mb-1">
           Password
         </label>
-        <div className="relative">
-          <input
-            id="password"
-            name="password"
-            type={showPwd ? "text" : "password"}
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="input-brand pr-12"
-            placeholder="••••••••"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPwd(!showPwd)}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500"
-          >
-            {showPwd ? "Hide" : "Show"}
-          </button>
-        </div>
+        <input
+          id="password"
+          type="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full rounded-md border border-slate-300 px-4 py-2.5 focus:border-sky-500 focus:outline-none"
+          placeholder="••••••••"
+        />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="btn-brand disabled:opacity-50"
+        className="w-full rounded-md bg-sky-600 px-4 py-2.5 text-white font-medium hover:bg-sky-700 disabled:opacity-50"
       >
-        {loading ? "Signing in..." : "Sign in"}
+        {loading ? 'Signing in…' : 'Sign in'}
       </button>
-
-      <p className="text-center text-xs text-slate-500">
-        Forgot password?{" "}
-        <a href="/reset" className="text-brand-600 hover:underline">
-          Reset here
-        </a>
-      </p>
     </form>
   );
-}
-
-// Fake login helper
-function fakeLogin(email, password) {
-  return new Promise((res, rej) => {
-    setTimeout(() => {
-      const ok = email === "demo@wallet.com" && password === "wallet123";
-      ok ? res() : rej(new Error("Invalid credentials"));
-    }, 800);
-  });
 }
