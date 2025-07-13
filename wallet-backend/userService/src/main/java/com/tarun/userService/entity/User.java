@@ -20,6 +20,10 @@ public class User {
 
     private String name;
 
+    private String address;   // <-- Added
+
+    private String phone;     // <-- Added
+
     @Column(nullable = false)
     private String password;
 }

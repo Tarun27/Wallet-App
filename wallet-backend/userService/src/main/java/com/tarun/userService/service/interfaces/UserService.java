@@ -10,5 +10,5 @@ public interface UserService {
     UserResponse getUserById(Long id);
     UserResponse getUserByEmail(String email);
 
-
+    UserResponse updateUserProfile(String email, UpdateUserRequest request);
 }

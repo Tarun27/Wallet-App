@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -29,12 +28,14 @@ public class UserController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/users/me")
-    public ResponseEntity<String> getCurrentUser(Authentication auth) {
-        return ResponseEntity.ok("Logged in as: " + auth.getName());
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(Authentication auth) {
+        String email = auth.getName();
+        UserResponse user = userService.getUserByEmail(email);
+        return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:[0-9]+}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
@@ -44,6 +45,15 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
-
-
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping("/profile")
+    public ResponseEntity<UserResponse> updateProfile(
+            @RequestBody UpdateUserRequest request,
+            Authentication authentication
+    ) {
+        // Find user by auth.getName() (email)
+        String email = authentication.getName();
+        UserResponse updated = userService.updateUserProfile(email, request);
+        return ResponseEntity.ok(updated);
+    }
 }

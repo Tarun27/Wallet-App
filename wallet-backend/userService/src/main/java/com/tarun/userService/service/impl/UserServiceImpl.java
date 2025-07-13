@@ -72,14 +72,40 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getAddress(), user.getPhone());
     }
 
     @Override
     public UserResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getAddress(), user.getPhone());
+    }
+
+    // UserServiceImpl.java
+    @Override
+    public UserResponse updateUserProfile(String email, UpdateUserRequest req) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setName(req.getName());
+        user.setAddress(req.getAddress());
+        user.setPhone(req.getPhone());
+        user.setEmail(req.getEmail());
+
+        if (req.getPassword() != null && !req.getPassword().isBlank()) {
+            user.setPassword(req.getPassword()); // encode!
+        }
+
+        userRepository.save(user);
+
+        UserResponse resp = new UserResponse();
+        resp.setId(user.getId());
+        resp.setName(user.getName());
+        resp.setEmail(user.getEmail());
+        resp.setAddress(user.getAddress());
+        resp.setPhone(user.getPhone());
+        return resp;
     }
 
 
