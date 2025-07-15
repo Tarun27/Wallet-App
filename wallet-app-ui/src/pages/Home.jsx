@@ -6,9 +6,8 @@ import WALLET from '../lib/walletApi';
 
 export default function Home() {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);             // { name, id, ... }
   const [cards, setCards] = useState([]);
-  const [transactions, setTransactions] = useState([]);
   const [loadingCards, setLoadingCards] = useState(true);
   const [showAddCard, setShowAddCard] = useState(false);
   const [addCardForm, setAddCardForm] = useState({
@@ -17,8 +16,6 @@ export default function Home() {
     nameOnCard: '',
     cardType: 'Credit',
   });
-
-  const totalBalance = cards.reduce((sum, c) => sum + (Number(c.balance) || 0), 0);
 
   /* ---------- Auth & Data ---------- */
   const doLogout = () => {
@@ -46,9 +43,9 @@ export default function Home() {
 
     const init = async () => {
       API.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const { data: user } = await API.get('/users/me');
-      setUserId(user.id);
-      await loadCards(user.id);
+      const { data: me } = await API.get('/users/me');
+      setUser(me);
+      await loadCards(me.id);
     };
     init();
   }, [navigate]);
@@ -66,8 +63,8 @@ export default function Home() {
       type: addCardForm.cardType,
     };
     try {
-      await WALLET.post(`/wallets/${userId}/cards`, payload);
-      await loadCards(userId);
+      await WALLET.post(`/wallets/${user?.id}/cards`, payload);
+      await loadCards(user.id);
       setShowAddCard(false);
       setAddCardForm({ number: '', exp: '', nameOnCard: '', cardType: 'Credit' });
     } catch (err) {
@@ -75,7 +72,7 @@ export default function Home() {
     }
   };
 
-  /* ---------- Mock Transactions (replace with API later) ---------- */
+  /* ---------- Mock Transactions ---------- */
   const mockTx = [
     { type: 'received', amount: 2500, desc: 'Salary', date: 'Today, 2:30 PM', icon: '💼' },
     { type: 'sent', amount: 45.99, desc: 'Groceries', date: 'Yesterday', icon: '🛒' },
@@ -85,25 +82,28 @@ export default function Home() {
   ];
 
   /* ---------- UI ---------- */
+  const totalBalance = cards.reduce((sum, c) => Number(c.balance || 0) + sum, 0);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
+      {/* Header with icons on top-right */}
       <header className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-sky-600 flex items-center justify-center text-white font-bold">
-            JD
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Good morning</p>
-            <p className="font-semibold">John Doe</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={doLogout} className="text-sm font-medium text-red-600 hover:underline">
-            Logout
-          </button>
-        </div>
-      </header>
+  <Link
+    to="/profile"
+    className="flex items-center gap-3 hover:bg-gray-100 rounded-md px-2 py-1"
+  >
+    <div className="h-10 w-10 rounded-full bg-sky-600 flex items-center justify-center text-white font-bold">
+      {(user?.name || 'U')[0].toUpperCase()}
+    </div>
+    <div>
+      <p className="font-semibold">{user?.name || 'User'}</p>
+    </div>
+  </Link>
+
+  <button onClick={doLogout} className="text-sm font-medium text-red-600 hover:underline">
+    Logout
+  </button>
+</header>
 
       {/* Balance Card */}
       <div className="p-4">
@@ -143,7 +143,9 @@ export default function Home() {
           {cards.map((c) => (
             <div
               key={c.id}
-              className={`min-w-[240px] rounded-xl p-4 text-white ${c.color || 'bg-gradient-to-r from-blue-500 to-cyan-500'}`}
+              className={`min-w-[240px] rounded-xl p-4 text-white ${
+                c.color || 'bg-gradient-to-r from-blue-500 to-cyan-500'
+              }`}
             >
               <div className="flex justify-between">
                 <div>
@@ -196,18 +198,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Bottom Nav (Tailwind only) */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2">
-        <Link to="/home" className="flex flex-col items-center text-sky-600">
-          <div className="w-5 h-5">🏠</div>
-          <span className="text-xs">Home</span>
-        </Link>
-        <Link to="/profile" className="flex flex-col items-center text-slate-600">
-          <div className="w-5 h-5">👤</div>
-          <span className="text-xs">Profile</span>
-        </Link>
       </div>
     </div>
   );
