@@ -1,92 +1,214 @@
 // src/pages/Home.jsx
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  CurrencyDollarIcon,
-  UserCircleIcon,
-} from '@heroicons/react/24/outline';
+import API from '../lib/api';
+import WALLET from '../lib/walletApi';
 
 export default function Home() {
   const navigate = useNavigate();
-  const [balance] = useState(12450.38); // mock
-  const [cards] = useState([
-    { id: 1, last4: '4242', type: 'Visa', exp: '12/27' },
-    { id: 2, last4: '5555', type: 'Master', exp: '08/26' },
-  ]);
+  const [userId, setUserId] = useState(null);
+  const [cards, setCards] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [loadingCards, setLoadingCards] = useState(true);
+  const [showAddCard, setShowAddCard] = useState(false);
+  const [addCardForm, setAddCardForm] = useState({
+    number: '',
+    exp: '',
+    nameOnCard: '',
+    cardType: 'Credit',
+  });
+
+  const totalBalance = cards.reduce((sum, c) => sum + (Number(c.balance) || 0), 0);
+
+  /* ---------- Auth & Data ---------- */
+  const doLogout = () => {
+    localStorage.clear();
+    navigate('/login', { replace: true });
+  };
+
+  const loadCards = async (uid) => {
+    setLoadingCards(true);
+    try {
+      const { data } = await WALLET.get(`/wallets/${uid}/cards`);
+      setCards(data);
+    } catch (err) {
+      if (err.response?.status === 401) doLogout();
+      else console.error(err);
+    } finally {
+      setLoadingCards(false);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('wallet-token');
-    const expiryRaw = localStorage.getItem('wallet-exp');
-    const expiry = Number(expiryRaw);
+    const expiry = Number(localStorage.getItem('wallet-exp'));
+    if (!token || isNaN(expiry) || expiry < Date.now()) return doLogout();
 
-    if (
-      !token ||
-      !expiryRaw ||
-      isNaN(expiry) ||
-      expiry < Date.now()
-    ) {
-      localStorage.clear();
-      navigate('/login', { replace: true });
-    }
+    const init = async () => {
+      API.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const { data: user } = await API.get('/users/me');
+      setUserId(user.id);
+      await loadCards(user.id);
+    };
+    init();
   }, [navigate]);
 
-  const logout = () => {
-    localStorage.clear();
-    navigate('/', { replace: true });
+  /* ---------- Card Management ---------- */
+  const handleInputChange = (e) =>
+    setAddCardForm({ ...addCardForm, [e.target.name]: e.target.value });
+
+  const handleAddCard = async (e) => {
+    e.preventDefault();
+    const payload = {
+      last4: addCardForm.number.slice(-4),
+      exp: addCardForm.exp,
+      nameOnCard: addCardForm.nameOnCard,
+      type: addCardForm.cardType,
+    };
+    try {
+      await WALLET.post(`/wallets/${userId}/cards`, payload);
+      await loadCards(userId);
+      setShowAddCard(false);
+      setAddCardForm({ number: '', exp: '', nameOnCard: '', cardType: 'Credit' });
+    } catch (err) {
+      alert(err.response?.data?.message || 'Add card failed');
+    }
   };
 
+  /* ---------- Mock Transactions (replace with API later) ---------- */
+  const mockTx = [
+    { type: 'received', amount: 2500, desc: 'Salary', date: 'Today, 2:30 PM', icon: '💼' },
+    { type: 'sent', amount: 45.99, desc: 'Groceries', date: 'Yesterday', icon: '🛒' },
+    { type: 'received', amount: 120, desc: 'Freelance', date: 'Dec 10', icon: '💻' },
+    { type: 'sent', amount: 89.5, desc: 'Electric Bill', date: 'Dec 9', icon: '⚡' },
+    { type: 'sent', amount: 25, desc: 'Coffee', date: 'Dec 8', icon: '☕' },
+  ];
+
+  /* ---------- UI ---------- */
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link to="/home" className="text-xl font-bold text-sky-700 hover:opacity-80 flex items-center space-x-2">
-            <CurrencyDollarIcon className="w-6 h-6" />
-            <span>Wallet</span>
-          </Link>
-          <div className="flex items-center space-x-4">
-            <Link to="/profile" className="flex items-center space-x-1 text-sm font-medium text-slate-600 hover:text-sky-600">
-              <UserCircleIcon className="w-5 h-5" />
-              <span>Profile</span>
-            </Link>
-            <button onClick={logout} className="text-sm font-medium text-slate-600 hover:text-red-600">
-              Logout
-            </button>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-sky-600 flex items-center justify-center text-white font-bold">
+            JD
           </div>
+          <div>
+            <p className="text-sm text-gray-600">Good morning</p>
+            <p className="font-semibold">John Doe</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={doLogout} className="text-sm font-medium text-red-600 hover:underline">
+            Logout
+          </button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Balance Card */}
-        <div className="md:col-span-2 bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-semibold mb-2">Total Balance</h2>
-          <p className="text-4xl font-bold text-sky-600">$ {balance.toLocaleString()}</p>
-          <div className="mt-4 flex gap-3">
-            <button className="rounded-md bg-sky-600 px-4 py-2 text-white text-sm">
-              Add Funds
-            </button>
-            <button className="rounded-md bg-white border border-sky-600 px-4 py-2 text-sky-600 text-sm">
-              Send
-            </button>
+      {/* Balance Card */}
+      <div className="p-4">
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-indigo-200 text-sm">Total Balance</p>
+              <p className="text-3xl font-bold">${totalBalance.toLocaleString()}</p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center text-sm text-green-300">
+                <span>+2.5%</span>
+              </div>
+              <p className="text-xs text-indigo-200">vs last month</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button className="flex-1 bg-white/20 rounded-md py-2 text-white text-sm">Send</button>
+            <button className="flex-1 bg-white/20 rounded-md py-2 text-white text-sm">Request</button>
+            <button className="flex-1 bg-white/20 rounded-md py-2 text-white text-sm">QR</button>
           </div>
         </div>
+      </div>
 
-        {/* Credit Card Section */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Credit Cards</h2>
-          {cards.map(c => (
-            <div key={c.id} className="mb-3 flex justify-between items-center">
-              <div>
-                <p className="font-medium">{c.type} **** {c.last4}</p>
-                <p className="text-xs text-slate-500">Expires {c.exp}</p>
-              </div>
-              {/* No balance shown */}
-            </div>
-          ))}
-          <button className="mt-2 w-full rounded-md bg-sky-100 text-sky-700 text-sm py-2">
-            Add Card
+      {/* Cards */}
+      <div className="px-4 mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-lg font-semibold">My Cards</h2>
+          <button
+            onClick={() => setShowAddCard(true)}
+            className="text-sm font-medium text-sky-600 hover:underline"
+          >
+            + Add Card
           </button>
         </div>
-      </main>
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {cards.map((c) => (
+            <div
+              key={c.id}
+              className={`min-w-[240px] rounded-xl p-4 text-white ${c.color || 'bg-gradient-to-r from-blue-500 to-cyan-500'}`}
+            >
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-xs opacity-80">{c.type}</p>
+                  <p className="font-bold">•••• {c.last4}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs opacity-80">Balance</p>
+                  <p className="font-bold">${Number(c.balance || 0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {showAddCard && (
+          <form onSubmit={handleAddCard} className="mt-4 space-y-2 bg-white p-4 rounded-xl shadow">
+            <input name="number" type="text" required placeholder="Card Number" maxLength={16} value={addCardForm.number} onChange={handleInputChange} className="w-full rounded-md border px-3 py-2" />
+            <input name="exp" type="text" required placeholder="MM/YY" maxLength={5} value={addCardForm.exp} onChange={handleInputChange} className="w-full rounded-md border px-3 py-2" />
+            <input name="nameOnCard" type="text" required placeholder="Name on Card" value={addCardForm.nameOnCard} onChange={handleInputChange} className="w-full rounded-md border px-3 py-2" />
+            <select name="cardType" value={addCardForm.cardType} onChange={handleInputChange} className="w-full rounded-md border px-3 py-2">
+              <option value="Credit">Credit</option>
+              <option value="Debit">Debit</option>
+            </select>
+            <div className="flex gap-2">
+              <button type="submit" className="flex-1 rounded-md bg-sky-600 text-white py-2">Save</button>
+              <button type="button" className="flex-1 rounded-md bg-gray-200 py-2" onClick={() => setShowAddCard(false)}>Cancel</button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Transactions */}
+      <div className="px-4 mb-20">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-lg font-semibold">Recent Transactions</h2>
+        </div>
+        <div className="bg-white rounded-xl shadow overflow-hidden">
+          {mockTx.map((tx, i) => (
+            <div key={i} className={`flex items-center justify-between p-4 ${i !== mockTx.length - 1 ? 'border-b border-gray-100' : ''}`}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-lg">{tx.icon}</div>
+                <div>
+                  <p className="font-medium">{tx.desc}</p>
+                  <p className="text-sm text-gray-500">{tx.date}</p>
+                </div>
+              </div>
+              <p className={`font-semibold ${tx.type === 'received' ? 'text-green-600' : 'text-gray-900'}`}>
+                {tx.type === 'received' ? '+' : '-'}${tx.amount.toFixed(2)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom Nav (Tailwind only) */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2">
+        <Link to="/home" className="flex flex-col items-center text-sky-600">
+          <div className="w-5 h-5">🏠</div>
+          <span className="text-xs">Home</span>
+        </Link>
+        <Link to="/profile" className="flex flex-col items-center text-slate-600">
+          <div className="w-5 h-5">👤</div>
+          <span className="text-xs">Profile</span>
+        </Link>
+      </div>
     </div>
   );
 }
