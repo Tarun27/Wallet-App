@@ -8,7 +8,6 @@ import ProfilePage         from './pages/ProfilePage';
 import ProductPage   from './pages/ProductPage';
 import SolutionsPage from './pages/SolutionsPage';
 import ResourcesPage from './pages/ResourcesPage';
-import OpenSourcePage from './pages/OpenSourcePage';
 import EnterprisePage from './pages/EnterprisePage';
 import PricingPage     from './pages/PricingPage';
 
@@ -26,7 +25,6 @@ export default function App() {
         <Route path="/product"     element={<ProductPage />} />
 <Route path="/solutions"   element={<SolutionsPage />} />
 <Route path="/resources"   element={<ResourcesPage />} />
-<Route path="/open-source" element={<OpenSourcePage />} />
 <Route path="/enterprise"  element={<EnterprisePage />} />
 <Route path="/pricing"     element={<PricingPage />} />
       </Routes>

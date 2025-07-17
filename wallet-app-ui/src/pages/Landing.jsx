@@ -24,7 +24,6 @@ export default function Landing() {
           <li><Link to="/product" className="hover:text-sky-600">Product</Link></li>
 <li><Link to="/solutions" className="hover:text-sky-600">Solutions</Link></li>
 <li><Link to="/resources" className="hover:text-sky-600">Resources</Link></li>
-<li><Link to="/open-source" className="hover:text-sky-600">Open Source</Link></li>
 <li><Link to="/enterprise" className="hover:text-sky-600">Enterprise</Link></li>
 <li><Link to="/pricing" className="hover:text-sky-600">Pricing</Link></li>
 
