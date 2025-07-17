@@ -21,12 +21,13 @@ export default function Landing() {
 
           {/* Center links */}
           <ul className="hidden md:flex space-x-6 text-sm font-medium">
-            <li><a href="#" className="hover:text-sky-600">Product</a></li>
-            <li><a href="#" className="hover:text-sky-600">Solutions</a></li>
-            <li><a href="#" className="hover:text-sky-600">Resources</a></li>
-            <li><a href="#" className="hover:text-sky-600">Open Source</a></li>
-            <li><a href="#" className="hover:text-sky-600">Enterprise</a></li>
-            <li><a href="#" className="hover:text-sky-600">Pricing</a></li>
+          <li><Link to="/product" className="hover:text-sky-600">Product</Link></li>
+<li><Link to="/solutions" className="hover:text-sky-600">Solutions</Link></li>
+<li><Link to="/resources" className="hover:text-sky-600">Resources</Link></li>
+<li><Link to="/open-source" className="hover:text-sky-600">Open Source</Link></li>
+<li><Link to="/enterprise" className="hover:text-sky-600">Enterprise</Link></li>
+<li><Link to="/pricing" className="hover:text-sky-600">Pricing</Link></li>
+
           </ul>
 
           {/* Right buttons */}
