@@ -10,6 +10,8 @@ import SolutionsPage from './pages/SolutionsPage';
 import ResourcesPage from './pages/ResourcesPage';
 import EnterprisePage from './pages/EnterprisePage';
 import PricingPage     from './pages/PricingPage';
+import CheckoutPage from './pages/CheckoutPage';
+import SuccessPage from './pages/SuccessPage';
 
 
 export default function App() {
@@ -27,6 +29,8 @@ export default function App() {
 <Route path="/resources"   element={<ResourcesPage />} />
 <Route path="/enterprise"  element={<EnterprisePage />} />
 <Route path="/pricing"     element={<PricingPage />} />
+<Route path="/checkout" element={<CheckoutPage />} />
+<Route path="/success"  element={<SuccessPage />} />
       </Routes>
     </BrowserRouter>
   );
