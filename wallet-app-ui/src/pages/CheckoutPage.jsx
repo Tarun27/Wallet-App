@@ -1,3 +1,4 @@
+// src/pages/CheckoutPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
@@ -15,40 +16,39 @@ const CheckoutForm = ({ plan }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) return;
-
     setLoading(true);
     setError(null);
 
-    // 1. Ask your backend to create a PaymentIntent
-    const res  = await fetch('/api/create-subscription', {
+    const res = await fetch('/api/create-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan }),
     });
     const { clientSecret } = await res.json();
 
-    // 2. Confirm card payment
     const { error: stripeError } = await stripe.confirmCardPayment(clientSecret, {
       payment_method: { card: elements.getElement(CardElement) },
     });
 
-    if (stripeError) {
-      setError(stripeError.message);
-    } else {
-      nav('/success');
-    }
+    if (stripeError) setError(stripeError.message);
+    else nav('/success');
     setLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <CardElement className="p-3 border rounded-md bg-white" />
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="border border-gray-300 rounded-md p-4 bg-white">
+        <CardElement options={{ hidePostalCode: true }} />
+      </div>
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
+
       <button
         disabled={!stripe || loading}
-        className="w-full bg-sky-600 text-white py-2 rounded-md disabled:opacity-60"
+        className="w-full bg-green-600 text-white font-semibold py-2.5 rounded-md
+                   hover:bg-green-700 disabled:opacity-60"
       >
-        {loading ? 'Processing…' : 'Subscribe'}
+        {loading ? 'Processing…' : `Subscribe to ${plan}`}
       </button>
     </form>
   );
@@ -56,25 +56,39 @@ const CheckoutForm = ({ plan }) => {
 
 export default function CheckoutPage() {
   const [params] = useSearchParams();
-  const plan = params.get('plan'); // pro / free (skip) / enterprise (blocked)
+  const plan = params.get('plan');
 
-  // Guard against bad links
-  if (plan === 'free') {
-    return <p className="p-8">Free plan selected – nothing to pay.</p>;
-  }
-  if (!plan || plan === 'enterprise') {
-    return <p className="p-8">Invalid plan.</p>;
-  }
+  if (plan === 'free') return <p className="p-8">Nothing to pay for the free plan.</p>;
+  if (!plan || plan === 'enterprise') return <p className="p-8">Invalid plan.</p>;
+
+  const planName = plan.charAt(0).toUpperCase() + plan.slice(1);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white shadow-xl rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-2">Complete subscription</h1>
-        <p className="mb-6 text-gray-600">Plan: <span className="font-semibold capitalize">{plan}</span></p>
+    <div className="min-h-screen bg-gray-50 flex items-start md:items-center justify-center p-4 md:p-12">
+      <div className="w-full max-w-4xl grid md:grid-cols-5 gap-0 shadow-xl rounded-lg overflow-hidden">
+        {/* Left summary column */}
+        <div className="md:col-span-2 bg-white p-8">
+          <h2 className="text-xl font-semibold mb-4">Order summary</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span>{planName}</span>
+              <span>$9 / month</span>
+            </div>
+            <hr />
+            <div className="flex justify-between font-semibold">
+              <span>Total due today</span>
+              <span>$9</span>
+            </div>
+          </div>
+        </div>
 
-        <Elements stripe={stripePromise}>
-          <CheckoutForm plan={plan} />
-        </Elements>
+        {/* Right payment column */}
+        <div className="md:col-span-3 bg-gray-900 text-white p-8">
+          <h2 className="text-xl font-semibold mb-4">Payment</h2>
+          <Elements stripe={stripePromise}>
+            <CheckoutForm plan={planName} />
+          </Elements>
+        </div>
       </div>
     </div>
   );
