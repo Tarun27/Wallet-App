@@ -41,14 +41,11 @@ A backend service for managing digital wallets, cards, and transactions. Built w
    ```
 
 ### Run with Docker
-1. Build Docker image:
-   ```bash
-   docker build -t wallet-service .
-   ```
-2. Start services with Docker Compose:
-   ```bash
-   docker-compose up
-   ```
+Use Docker Compose to build and start all services:
+```bash
+docker compose up --build
+```
+This command will build the Docker images and start all services as defined in `docker-compose.yml`.
 
 ## Project Structure
 - `controller/` - REST API controllers
@@ -86,4 +83,3 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## License
 This project is licensed under the MIT License.
-
